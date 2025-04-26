@@ -2,11 +2,19 @@ pipeline {
     agent any
 
     stages {
+
+        stage('Read File') {
+           steps {
+                script {
+                    // Replace 'path/to/your/file.txt' with the relative path to your file in the workspace
+                    def fileContent = readFile 'path/to/your/file.txt'
+                    echo "File Content: ${fileContent}"
+                }
+           }
+        }
+
         stage('Checkout Backend') {
             steps {
-                def fileContent = readFile '/Users/narekbabayan/Desktop/devops/nest-next-deployment/.env_front'
-                echo "File Content: ${fileContent}"
-
                 echo 'Checking out the backend application...'
                 git branch: 'main',
                     url: 'https://github.com/Narek97/my-app-back.git'
