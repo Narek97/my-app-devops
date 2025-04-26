@@ -3,112 +3,59 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            parallel {
-                stage('Checkout Backend') {
-                    steps {
-                        echo 'Checking out the backend application...'
-                        git branch: 'main',
-                            url: 'https://github.com/Narek97/my-app-back.git'
-                    }
-                }
-                stage('Checkout Frontend') {
-                    steps {
-                        echo 'Checking out the frontend application...'
-                        git branch: 'main',
-                            url: 'https://github.com/Narek97/my-app-front.git'
-                    }
-                }
+            steps {
+                echo 'Checking out the application...'
+                git branch: 'main',
+                    url: 'https://github.com/Narek97/my-app-baxck.git'
             }
         }
 
-        stage('Process Backend') {
+        stage('Lint') {
             agent {
                 docker {
                     image 'node:20-alpine'
                     reuseNode true
                 }
             }
-            stages {
-                stage('Lint Backend') {
-                    steps {
-                        dir('my-app-back') {
-                            echo 'Checking backend code style (lint)...'
-                            sh 'yarn install'
-                            sh 'yarn lint'
-                        }
-                    }
-                }
-                stage('Test Backend') {
-                    steps {
-                        dir('my-app-back') {
-                            echo 'Running backend tests...'
-                            sh 'yarn install'
-                            sh 'yarn test'
-                        }
-                    }
-                }
-                stage('Build Backend') {
-                    steps {
-                        dir('my-app-back') {
-                            echo 'Building the backend application...'
-                            sh 'yarn install'
-                            sh 'yarn build'
-                        }
-                    }
-                }
+            steps {
+                echo 'Checking code style (lint)...'
+                sh 'yarn install'
+                sh 'yarn lint'
             }
         }
 
-        stage('Process Frontend') {
+        stage('Test') {
             agent {
                 docker {
                     image 'node:20-alpine'
                     reuseNode true
                 }
             }
-            stages {
-                stage('Lint Frontend') {
-                    steps {
-                        dir('my-app-front') {
-                            echo 'Checking frontend code style (lint)...'
-                            sh 'yarn install'
-                            sh 'yarn lint'
-                        }
-                    }
-                }
-                stage('Test Frontend') {
-                    steps {
-                        dir('my-app-front') {
-                            echo 'Running frontend tests...'
-                            sh 'yarn install'
-                            sh 'yarn test'
-                        }
-                    }
-                }
-                stage('Build Frontend') {
-                    steps {
-                        dir('my-app-front') {
-                            echo 'Building the frontend application...'
-                            sh 'yarn install'
-                            sh 'yarn build'
-                        }
-                    }
-                }
+            steps {
+                echo 'Running tests...'
+                sh 'yarn install'
+                sh 'yarn test'
             }
         }
 
+        stage('Build') {
+            agent {
+                docker {
+                    image 'node:20-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo 'Building the application inside Docker...'
+                sh 'yarn install'
+                sh 'yarn build'
+            }
+        }
 
         stage('Deploy') {
             steps {
-                echo 'Deploying applications to S3...'
-                dir('my-app-back') {
-                    echo 'Deploying backend to S3...'
-                    // sh 'aws s3 sync build/ s3://your-backend-bucket-name --delete'
-                }
-                dir('my-app-front') {
-                    echo 'Deploying frontend to S3...'
-                    // sh 'aws s3 sync build/ s3://your-frontend-bucket-name --delete'
-                }
+                echo 'Deploying application to S3...'
+//                 sh 'aws s3 sync build/ s3://your-bucket-name --delete'
             }
         }
     }
