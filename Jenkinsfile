@@ -2,11 +2,12 @@ pipeline {
     agent any
 
     stages {
-        // Backend Stages
         stage('Checkout Backend') {
             steps {
+                def fileContent = readFile '/Users/narekbabayan/Desktop/devops/nest-next-deployment/.env_front'
+                echo "File Content: ${fileContent}"
+
                 echo 'Checking out the backend application...'
-                cat /Users/narekbabayan/Desktop/devops/nest-next-deployment/.env_front
                 git branch: 'main',
                     url: 'https://github.com/Narek97/my-app-back.git'
             }
@@ -43,7 +44,8 @@ pipeline {
         stage('Build Backend') {
             agent {
                 docker {
-                    image 'node:20-alpine'
+                    image 'docker:20.10' // Use a Docker image with docker CLI and compose
+                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket
                     reuseNode true
                 }
             }
@@ -61,7 +63,7 @@ pipeline {
             }
         }
 
-        // Frontend Stages
+        // Frontend stages (unchanged, included for completeness)
         stage('Checkout Frontend') {
             steps {
                 echo 'Checking out the frontend application...'
