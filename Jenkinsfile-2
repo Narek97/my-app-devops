@@ -6,7 +6,6 @@ pipeline {
         stage('Checkout Backend') {
             steps {
                 echo 'Checking out the backend application...'
-                cat /Users/narekbabayan/Desktop/devops/nest-next-deployment/.env_front
                 git branch: 'main',
                     url: 'https://github.com/Narek97/my-app-back.git'
             }
