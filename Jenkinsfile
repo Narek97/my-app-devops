@@ -48,7 +48,7 @@ pipeline {
             }
             steps {
                 echo 'Building the backend application inside Docker...'
-                sh 'docker compose -f docker-compose-build.yml --env-file /Users/narekbabayan/Desktop/devops/nest-next-deployment/devops/home/front build'
+                sh 'docker compose -f docker-compose-build.yml --env-file ./home/front/.env_front build'
             }
         }
 
