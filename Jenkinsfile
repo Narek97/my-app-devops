@@ -2,15 +2,16 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        // Backend Stages
+        stage('Checkout Backend') {
             steps {
-                echo 'Checking out the application...'
+                echo 'Checking out the backend application...'
                 git branch: 'main',
                     url: 'https://github.com/Narek97/my-app-back.git'
             }
         }
 
-        stage('Lint') {
+        stage('Lint Backend') {
             agent {
                 docker {
                     image 'node:20-alpine'
@@ -18,13 +19,13 @@ pipeline {
                 }
             }
             steps {
-                echo 'Checking code style (lint)...'
+                echo 'Checking backend code style (lint)...'
                 sh 'yarn install'
                 sh 'yarn lint'
             }
         }
 
-        stage('Test') {
+        stage('Test Backend') {
             agent {
                 docker {
                     image 'node:20-alpine'
@@ -32,13 +33,13 @@ pipeline {
                 }
             }
             steps {
-                echo 'Running tests...'
+                echo 'Running backend tests...'
                 sh 'yarn install'
                 sh 'yarn test'
             }
         }
 
-        stage('Build') {
+        stage('Build Backend') {
             agent {
                 docker {
                     image 'node:20-alpine'
@@ -46,16 +47,74 @@ pipeline {
                 }
             }
             steps {
-                echo 'Building the application inside Docker...'
+                echo 'Building the backend application inside Docker...'
                 sh 'yarn install'
                 sh 'yarn build'
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy Backend') {
             steps {
-                echo 'Deploying application to S3...'
-//                 sh 'aws s3 sync build/ s3://your-bucket-name --delete'
+                echo 'Deploying backend application to S3...'
+                // sh 'aws s3 sync build/ s3://your-back-bucket-name --delete'
+            }
+        }
+
+        // Frontend Stages
+        stage('Checkout Frontend') {
+            steps {
+                echo 'Checking out the frontend application...'
+                git branch: 'main',
+                    url: 'https://github.com/Narek97/my-app-front.git'
+            }
+        }
+
+        stage('Lint Frontend') {
+            agent {
+                docker {
+                    image 'node:20-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo 'Checking frontend code style (lint)...'
+                sh 'yarn install'
+                sh 'yarn lint'
+            }
+        }
+
+        stage('Test Frontend') {
+            agent {
+                docker {
+                    image 'node:20-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo 'Running frontend tests...'
+                sh 'yarn install'
+                sh 'yarn test'
+            }
+        }
+
+        stage('Build Frontend') {
+            agent {
+                docker {
+                    image 'node:20-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                echo 'Building the frontend application inside Docker...'
+                sh 'yarn install'
+                sh 'yarn build'
+            }
+        }
+
+        stage('Deploy Frontend') {
+            steps {
+                echo 'Deploying frontend application to S3...'
+                // sh 'aws s3 sync build/ s3://your-front-bucket-name --delete'
             }
         }
     }
