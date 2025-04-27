@@ -108,7 +108,7 @@ pipeline {
                     echo 'Building the frontend application inside Docker...'
                     sh 'yarn install'
                     sh 'yarn build'
-                    sh 'ls -la .env_front || echo ".env_front not found"'
+                    sh 'ls -la ./home/front/.env_front || echo ".env_front not found"'
                 }
             }
         }
