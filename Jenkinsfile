@@ -42,13 +42,15 @@ pipeline {
             agent {
                 docker {
                     image 'docker:20.10' // Use a Docker image with docker CLI and compose
-                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket
                     reuseNode true
                 }
             }
             steps {
+                echo 'Checking out the devops repository for environment variables...'
+                git branch: 'main',
+                    url: 'https://github.com/Narek97/my-app-devops.git',
                 echo 'Building the backend application inside Docker...'
-                sh 'docker compose -f docker-compose-build.yml --env-file ./home/front/.env_front build'
+                sh 'docker compose -f docker-compose-build.yml --env-file my-app-devops/.env_front build'
             }
         }
 
