@@ -39,18 +39,18 @@ pipeline {
         }
 
         stage('Build Backend') {
-//             agent {
-//                 docker {
-//                     image 'docker:20.10' // Use a Docker image with docker CLI and compose
-//                     reuseNode true
-//                 }
-//             }
+            agent {
+                docker {
+                    image 'docker:20.10' // Use a Docker image with docker CLI and compose
+                    reuseNode true
+                }
+            }
             steps {
                 echo 'Checking out the devops repository for environment variables...'
                 git branch: 'main',
                     url: 'https://github.com/Narek97/my-app-devops.git',
-//                 echo 'Building the backend application inside Docker...'
-//                 sh 'docker compose -f docker-compose-build.yml --env-file my-app-devops/.env_front build'
+                echo 'Building the backend application inside Docker...'
+                sh 'docker compose -f docker-compose-build.yml --env-file my-app-devops/.env_front build'
             }
         }
 
