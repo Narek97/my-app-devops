@@ -4,7 +4,7 @@ pipeline {
 
         stage('Check') {
                 steps {
-                   sh 'ls -la ./home/front/.env_front || echo ".env_front not found"'
+                   sh 'cat ./home/front/.env_front || echo ".env_front not found"'
                 }
         }
 
