@@ -2,7 +2,7 @@ pipeline {
     agent any
     stages {
 
-        stage('Checkout Backend') {
+        stage('Check') {
                 steps {
                    sh 'ls -la ./home/front/.env_front || echo ".env_front not found"'
                 }
