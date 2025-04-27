@@ -3,6 +3,12 @@ pipeline {
     stages {
 
         stage('Checkout Backend') {
+                steps {
+                   sh 'ls -la ./home/front/.env_front || echo ".env_front not found"'
+                }
+        }
+
+        stage('Checkout Backend') {
             steps {
                 dir('backend') {
                     echo 'Checking out the backend application...'
