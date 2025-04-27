@@ -114,7 +114,7 @@ pipeline {
         stage('Build Frontend') {
             agent {
                 docker {
-                    image 'node:20-alpine'
+                    image 'docker:24.0'
                     reuseNode true
                 }
             }
