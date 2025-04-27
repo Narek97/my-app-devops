@@ -2,12 +2,6 @@ pipeline {
     agent any
     stages {
 
-        stage('Check') {
-                steps {
-                   sh 'cat ./home/front/.env_front || echo ".env_front not found"'
-                }
-        }
-
         stage('Checkout Backend') {
             steps {
                 dir('backend') {
@@ -102,6 +96,21 @@ pipeline {
             }
         }
 
+//         stage('Build Frontend') {
+//             agent {
+//                 docker {
+//                     image 'node:20-alpine'
+//                     reuseNode true
+//                 }
+//             }
+//             steps {
+//                 dir('frontend') {
+//                     echo 'Building the frontend application inside Docker...'
+//                     sh 'yarn install'
+//                     sh 'yarn build'
+//                 }
+//             }
+//         }
         stage('Build Frontend') {
             agent {
                 docker {
@@ -112,9 +121,7 @@ pipeline {
             steps {
                 dir('frontend') {
                     echo 'Building the frontend application inside Docker...'
-                    sh 'yarn install'
-                    sh 'yarn build'
-                    sh 'ls -la ./home/front/.env_front || echo ".env_front not found"'
+                    sh 'docker compose -f docker-compose-build.yml --env-file ./home/front/.env_front build'
                 }
             }
         }
