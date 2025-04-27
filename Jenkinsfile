@@ -39,12 +39,22 @@ pipeline {
         }
 
         stage('Build Backend') {
+            agent {
+                docker {
+                    image 'docker:20.10' // Use a Docker image with docker CLI and compose
+                    reuseNode true
+                }
+            }
+            environment {
+                // Define an environment variable for the .env_front file path
+                ENV_FILE_PATH = "${WORKSPACE}/home/front/.env_front"
+            }
             steps {
-                echo 'Checking out the devops repository for environment variables...'
-                git branch: 'main',
-                    url: 'https://github.com/Narek97/my-app-devops.git',
                 echo 'Building the backend application inside Docker...'
-//                 sh 'docker compose -f docker-compose-build.yml --env-file my-app-devops/.env_front build'
+                // Verify the .env_front file exists (optional, for debugging)
+                sh 'ls -l ${ENV_FILE_PATH} || echo "Error: .env_front file not found"'
+                // Use the environment variable in the docker compose command
+                sh 'docker compose -f docker-compose-build.yml --env-file ${ENV_FILE_PATH} build'
             }
         }
 
@@ -55,7 +65,7 @@ pipeline {
             }
         }
 
-        // Frontend stages (unchanged, included for completeness)
+        // Frontend stages (unchanged)
         stage('Checkout Frontend') {
             steps {
                 echo 'Checking out the frontend application...'
