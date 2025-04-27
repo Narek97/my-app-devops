@@ -4,9 +4,11 @@ pipeline {
 
         stage('Checkout Backend') {
             steps {
-                echo 'Checking out the backend application...'
-                git branch: 'main',
-                    url: 'https://github.com/Narek97/my-app-back.git'
+                dir('backend') {
+                    echo 'Checking out the backend application...'
+                    git branch: 'main',
+                        url: 'https://github.com/Narek97/my-app-back.git'
+                }
             }
         }
 
@@ -18,9 +20,11 @@ pipeline {
                 }
             }
             steps {
-                echo 'Checking backend code style (lint)...'
-                sh 'yarn install'
-                sh 'yarn lint'
+                dir('backend') {
+                    echo 'Checking backend code style (lint)...'
+                    sh 'yarn install'
+                    sh 'yarn lint'
+                }
             }
         }
 
@@ -32,25 +36,31 @@ pipeline {
                 }
             }
             steps {
-                echo 'Running backend tests...'
-                sh 'yarn install'
-                sh 'yarn test'
+                dir('backend') {
+                    echo 'Running backend tests...'
+                    sh 'yarn install'
+                    sh 'yarn test'
+                }
             }
         }
 
         stage('Deploy Backend') {
             steps {
-                echo 'Deploying backend application to S3...'
-                // sh 'aws s3 sync build/ s3://your-back-bucket-name --delete'
+                dir('backend') {
+                    echo 'Deploying backend application to S3...'
+                    // Example:
+                    // sh 'aws s3 sync build/ s3://your-back-bucket-name --delete'
+                }
             }
         }
 
-        // Frontend stages (unchanged, included for completeness)
         stage('Checkout Frontend') {
             steps {
-                echo 'Checking out the frontend application...'
-                git branch: 'main',
-                    url: 'https://github.com/Narek97/my-app-front.git'
+                dir('frontend') {
+                    echo 'Checking out the frontend application...'
+                    git branch: 'main',
+                        url: 'https://github.com/Narek97/my-app-front.git'
+                }
             }
         }
 
@@ -62,9 +72,11 @@ pipeline {
                 }
             }
             steps {
-                echo 'Checking frontend code style (lint)...'
-                sh 'yarn install'
-                sh 'yarn lint'
+                dir('frontend') {
+                    echo 'Checking frontend code style (lint)...'
+                    sh 'yarn install'
+                    sh 'yarn lint'
+                }
             }
         }
 
@@ -76,9 +88,11 @@ pipeline {
                 }
             }
             steps {
-                echo 'Running frontend tests...'
-                sh 'yarn install'
-                sh 'yarn test'
+                dir('frontend') {
+                    echo 'Running frontend tests...'
+                    sh 'yarn install'
+                    sh 'yarn test'
+                }
             }
         }
 
@@ -90,17 +104,22 @@ pipeline {
                 }
             }
             steps {
-                echo 'Building the frontend application inside Docker...'
-//                 sh 'yarn install'
-//                 sh 'yarn build'
-                sh 'ls -la ./home/front/.env_front || echo ".env_front not found"'
+                dir('frontend') {
+                    echo 'Building the frontend application inside Docker...'
+                    sh 'yarn install'
+                    sh 'yarn build'
+                    sh 'ls -la .env_front || echo ".env_front not found"'
+                }
             }
         }
 
         stage('Deploy Frontend') {
             steps {
-                echo 'Deploying frontend application to S3...'
-                // sh 'aws s3 sync build/ s3://your-front-bucket-name --delete'
+                dir('frontend') {
+                    echo 'Deploying frontend application to S3...'
+                    // Example:
+                    // sh 'aws s3 sync build/ s3://your-front-bucket-name --delete'
+                }
             }
         }
     }
