@@ -1,138 +1,28 @@
 pipeline {
     agent any
-
     stages {
-        stage('Checkout Backend') {
+        stage('Check rnv.file') {
             steps {
-                echo 'Checking out the backend application...'
-                git branch: 'main',
-                    url: 'https://github.com/Narek97/my-app-back.git'
-            }
-        }
-
-        stage('Lint Backend') {
-            agent {
-                docker {
-                    image 'node:20-alpine'
-                    reuseNode true
+                script {
+                    // Check if the file exists
+                    if (fileExists('./home/front/rnv.file')) {
+                        echo 'rnv.file exists'
+                        // Optionally, you can add commands to read or process the file
+                        // For example, to display the file content:
+                        sh 'cat ./home/front/rnv.file'
+                    } else {
+                        error 'rnv.file does not exist'
+                    }
                 }
-            }
-            steps {
-                echo 'Checking backend code style (lint)...'
-                sh 'yarn install'
-                sh 'yarn lint'
-            }
-        }
-
-        stage('Test Backend') {
-            agent {
-                docker {
-                    image 'node:20-alpine'
-                    reuseNode true
-                }
-            }
-            steps {
-                echo 'Running backend tests...'
-                sh 'yarn install'
-                sh 'yarn test'
-            }
-        }
-
-        stage('Build Backend') {
-            agent {
-                docker {
-                    image 'docker:20.10' // Use a Docker image with docker CLI and compose
-                    reuseNode true
-                }
-            }
-            environment {
-                // Define an environment variable for the .env_front file path
-                ENV_FILE_PATH = "${WORKSPACE}/home/front/.env_front"
-            }
-            steps {
-                echo 'Building the backend application inside Docker...'
-                // Verify the .env_front file exists (optional, for debugging)
-                sh 'ls -l ${ENV_FILE_PATH} || echo "Error: .env_front file not found"'
-                // Use the environment variable in the docker compose command
-                sh 'docker compose -f docker-compose-build.yml --env-file ${ENV_FILE_PATH} build'
-            }
-        }
-
-        stage('Deploy Backend') {
-            steps {
-                echo 'Deploying backend application to S3...'
-                // sh 'aws s3 sync build/ s3://your-back-bucket-name --delete'
-            }
-        }
-
-        // Frontend stages (unchanged)
-        stage('Checkout Frontend') {
-            steps {
-                echo 'Checking out the frontend application...'
-                git branch: 'main',
-                    url: 'https://github.com/Narek97/my-app-front.git'
-            }
-        }
-
-        stage('Lint Frontend') {
-            agent {
-                docker {
-                    image 'node:20-alpine'
-                    reuseNode true
-                }
-            }
-            steps {
-                echo 'Checking frontend code style (lint)...'
-                sh 'yarn install'
-                sh 'yarn lint'
-            }
-        }
-
-        stage('Test Frontend') {
-            agent {
-                docker {
-                    image 'node:20-alpine'
-                    reuseNode true
-                }
-            }
-            steps {
-                echo 'Running frontend tests...'
-                sh 'yarn install'
-                sh 'yarn test'
-            }
-        }
-
-        stage('Build Frontend') {
-            agent {
-                docker {
-                    image 'node:20-alpine'
-                    reuseNode true
-                }
-            }
-            steps {
-                echo 'Building the frontend application inside Docker...'
-                sh 'yarn install'
-                sh 'yarn build'
-            }
-        }
-
-        stage('Deploy Frontend') {
-            steps {
-                echo 'Deploying frontend application to S3...'
-                // sh 'aws s3 sync build/ s3://your-front-bucket-name --delete'
             }
         }
     }
-
     post {
         always {
-            echo 'Pipeline finished.'
-        }
-        success {
-            echo '✅ Pipeline succeeded.'
+            echo 'Pipeline execution completed'
         }
         failure {
-            echo '❌ Pipeline failed.'
+            echo 'Pipeline failed due to missing rnv.file'
         }
     }
 }
